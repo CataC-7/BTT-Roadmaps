@@ -1,0 +1,2356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100-Day Mind Map App - Detailed Daily Plan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 40px;
+            font-size: 1.2rem;
+        }
+
+        .phase-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .phase-btn {
+            padding: 12px 24px;
+            background: #e2e8f0;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .phase-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .phase-content {
+            display: none;
+        }
+
+        .phase-content.active {
+            display: block;
+        }
+
+        .phase-header {
+            background: linear-gradient(135deg, #667eea20, #764ba220);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 5px solid #667eea;
+        }
+
+        .phase-title {
+            color: #667eea;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .phase-description {
+            color: #4a5568;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .week {
+            background: white;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .week-header {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .week-header:hover {
+            background: linear-gradient(135deg, #38a169, #2f855a);
+        }
+
+        .week-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .week-milestone {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .toggle-icon {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .week-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .week-content.expanded {
+            max-height: 2000px;
+        }
+
+        .week-details {
+            padding: 25px;
+        }
+
+        .milestone-box {
+            background: #f0fff4;
+            border: 2px solid #48bb78;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .milestone-box h4 {
+            color: #2f855a;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .day {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 18px;
+            border-left: 4px solid #cbd5e0;
+            transition: all 0.3s ease;
+        }
+
+        .day:hover {
+            border-left-color: #667eea;
+            transform: translateX(5px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .day-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .day-type {
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .learn {
+            background: #fef5e7;
+            color: #c05621;
+        }
+
+        .build {
+            background: #e6fffa;
+            color: #0d9488;
+        }
+
+        .practice {
+            background: #ede9fe;
+            color: #7c3aed;
+        }
+
+        .day-title {
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .day-tasks {
+            list-style: none;
+        }
+
+        .day-tasks li {
+            color: #4a5568;
+            padding: 3px 0;
+            padding-left: 25px;
+            position: relative;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .day-tasks li:hover {
+            color: #2d3748;
+        }
+
+        .task-checkbox {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            border: 2px solid #667eea;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-checkbox:hover {
+            border-color: #4c51bf;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .task-checkbox.checked {
+            background: #667eea;
+            border-color: #667eea;
+        }
+
+        .task-checkbox.checked::after {
+            content: "✓";
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .day-tasks li.completed {
+            color: #718096;
+            text-decoration: line-through;
+        }
+
+        .progress-indicator {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 6px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            font-size: 0.8rem;
+            color: #718096;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .time-estimate {
+            color: #718096;
+            font-size: 0.8rem;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .days-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .phase-btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 100-Day Mind Map Challenge</h1>
+        <p class="subtitle">Your Complete Day-by-Day Roadmap to Building a Visual Note-Taking App</p>
+
+        <div class="phase-selector">
+            <button class="phase-btn active" onclick="showPhase(1)">Phase 1: Foundation</button>
+            <button class="phase-btn" onclick="showPhase(2)">Phase 2: Core Interactions</button>
+            <button class="phase-btn" onclick="showPhase(3)">Phase 3: Polish & Features</button>
+            <button class="phase-btn" onclick="showPhase(4)">Phase 4: Refinement</button>
+        </div>
+
+        <!-- Phase 1: Foundation (Days 1-25) -->
+        <div class="phase-content active" id="phase1">
+            <div class="phase-header">
+                <h2 class="phase-title">Phase 1: Foundation (Days 1-25)</h2>
+                <p class="phase-description">Build your development environment and master the core technologies. By the end of this phase, you'll have a basic canvas where you can create and drag simple nodes.</p>
+            </div>
+
+            <!-- Week 1 -->
+            <div class="week">
+                <div class="week-header" onclick="toggleWeek(this)">
+                    <div class="week-title">Week 1: Development Setup & Canvas Basics</div>
+                    <div class="week-milestone">🎯 Click to create nodes on canvas</div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="week-content">
+                    <div class="week-details">
+                        <div class="milestone-box">
+                            <h4>Week 1 Milestone</h4>
+                            <p>A working HTML page with a canvas where you can click anywhere to create simple colored circles (nodes). Basic project structure set up with Git.</p>
+                        </div>
+                        <div class="days-grid">
+
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">1</div>
+                                    <div class="day-type learn">Learn</div>
+                                </div>
+                                <div class="day-title">Environment Setup</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Install VS Code + Live Server extension</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Set up GitHub account and install Git</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create project folder structure</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Initialize Git repository</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Write a basic HTML5 boilerplate</li>
+                                </ul>
+                                <div class="time-estimate">Time: 45-60 mins</div>
+                            </div>
+
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">2</div>
+                                    <div class="day-type learn">Learn</div>
+                                </div>
+                                <div class="day-title">HTML5 Canvas Introduction</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn canvas element basics</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Understand canvas coordinate system</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Practice drawing basic shapes (rectangles, circles)</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn getContext('2d') method</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create your first canvas drawing</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-75 mins</div>
+                            </div>
+
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">3</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Canvas Event Handling</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn mouse event listeners</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Get mouse coordinates on canvas</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Handle canvas coordinate conversion</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create click handler function</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test mouse position detection</li>
+                                </ul>
+                                <div class="time-estimate">Time: 45-60 mins</div>
+                            </div>
+                            
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">4</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">First Interactive Feature</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Combine click handling with drawing</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create circles at click positions</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add different colors for variety</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Handle canvas clearing and redrawing</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test your first interactive feature!</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-75 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">5</div>
+                                    <div class="day-type learn">Learn</div>
+                                </div>
+                                <div class="day-title">JavaScript Objects & Arrays</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Review JavaScript objects and arrays</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn about storing data in arrays</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Practice array methods (push, forEach)</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create a simple node data structure</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Store multiple nodes in an array</li>
+                                </ul>
+                                <div class="time-estimate">Time: 45-60 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">6</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Node Data Management</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Refactor to store nodes in array</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create draw function that renders all nodes</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add unique IDs to each node</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement canvas clearing and redrawing</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test multiple node creation</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">7</div>
+                                    <div class="day-type practice">Practice</div>
+                                </div>
+                                <div class="day-title">Week 1 Review & Polish</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Review all week 1 code</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add comments to your code</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Fix any bugs found</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Commit your work to Git</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test week 1 milestone completion</li>
+                                </ul>
+                                <div class="time-estimate">Time: 45-60 mins</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 2 -->
+            <div class="week">
+                <div class="week-header" onclick="toggleWeek(this)">
+                    <div class="week-title">Week 2: Object-Oriented Structure</div>
+                    <div class="week-milestone">🎯 Node class with properties</div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="week-content">
+                    <div class="week-details">
+                        <div class="milestone-box">
+                            <h4>Week 2 Milestone</h4>
+                            <p>Refactored code using a Node class. Nodes have properties like position, size, color, and text. Clean, organized code structure.</p>
+                        </div>
+                        <div class="days-grid">
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">8</div>
+                                    <div class="day-type learn">Learn</div>
+                                </div>
+                                <div class="day-title">JavaScript Classes</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn ES6 class syntax</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Understand constructors and methods</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Practice creating simple classes</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn about 'this' keyword</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create a basic Node class outline</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-75 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">9</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Node Class Implementation</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create Node class with constructor</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add properties: x, y, radius, color</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create draw() method for Node</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test creating Node instances</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Refactor existing code to use Node class</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">10</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Enhanced Node Properties</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add text property to nodes</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement text rendering on canvas</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add node selection state</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create different visual styles</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test enhanced node display</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-75 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">11</div>
+                                    <div class="day-type learn">Learn</div>
+                                </div>
+                                <div class="day-title">CSS Styling & Layout</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Review CSS Grid and Flexbox</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn modern CSS layout techniques</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Study responsive design principles</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Practice CSS animations basics</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Plan your app's UI layout</li>
+                                </ul>
+                                <div class="time-estimate">Time: 45-60 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">12</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">UI Structure & Styling</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create proper HTML structure</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add CSS for canvas container</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Style your app with modern design</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Make canvas responsive</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add basic toolbar placeholder</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">13</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Code Organization</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Separate JavaScript into modules</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create separate files for different classes</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Organize CSS into logical sections</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add proper code documentation</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test modular code structure</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-75 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">14</div>
+                                    <div class="day-type practice">Practice</div>
+                                </div>
+                                <div class="day-title">Week 2 Integration & Testing</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test all Week 2 features together</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Debug any integration issues</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Refactor code for better organization</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Update documentation</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Commit progress to Git</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-75 mins</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 3 -->
+            <div class="week">
+                <div class="week-header" onclick="toggleWeek(this)">
+                    <div class="week-title">Week 3: Drag & Drop Functionality</div>
+                    <div class="week-milestone">🎯 Fully draggable nodes</div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="week-content">
+                    <div class="week-details">
+                        <div class="milestone-box">
+                            <h4>Week 3 Milestone</h4>
+                            <p>Smooth drag and drop functionality. Nodes can be selected, dragged around the canvas, and dropped in new positions. Proper hit detection implemented.</p>
+                        </div>
+                        <div class="days-grid">
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">15</div>
+                                    <div class="day-type learn">Learn</div>
+                                </div>
+                                <div class="day-title">Mouse Event Handling Deep Dive</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn mousedown, mousemove, mouseup events</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Understand event bubbling and capturing</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Study drag and drop patterns</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn about mouse state tracking</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Practice basic drag examples</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-75 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">16</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Hit Detection System</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create function to detect node under cursor</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement point-in-circle collision</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add node selection functionality</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Visual feedback for node selection</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test hit detection accuracy</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">17</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Basic Drag Implementation</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement mousedown handler for nodes</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create drag state management</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add mousemove handler for dragging</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Update node position during drag</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test basic drag functionality</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">18</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Smooth Dragging & Drop</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add mouseup handler to end drag</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement smooth dragging with offset</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Handle edge cases (cursor leaving canvas)</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add visual feedback during drag</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test complete drag and drop cycle</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">19</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Multi-Node Management</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Handle multiple nodes properly</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement z-order (which node is on top)</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add node deselection functionality</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Optimize redrawing during drag</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test with many nodes</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-75 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">20</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Performance & Polish</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Optimize canvas redrawing performance</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add smooth cursor changes</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement proper event cleanup</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add drag constraints if needed</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Polish visual feedback</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-75 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">21</div>
+                                    <div class="day-type practice">Practice</div>
+                                </div>
+                                <div class="day-title">Week 3 Testing & Debugging</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Thoroughly test drag and drop</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Fix any performance issues</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Debug edge cases</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Code review and cleanup</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Document drag system</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-75 mins</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 4 -->
+            <div class="week">
+                <div class="week-header" onclick="toggleWeek(this)">
+                    <div class="week-title">Week 4: Foundation Completion</div>
+                    <div class="week-milestone">🎯 Solid foundation with basic persistence</div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="week-content">
+                    <div class="week-details">
+                        <div class="milestone-box">
+                            <h4>Week 4 Milestone</h4>
+                            <p>Complete foundation phase with node creation, editing, dragging, and basic save/load using localStorage. Clean, documented codebase ready for Phase 2.</p>
+                        </div>
+                        <div class="days-grid">
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">22</div>
+                                    <div class="day-type learn">Learn</div>
+                                </div>
+                                <div class="day-title">Local Storage & JSON</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn localStorage API</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Understand JSON serialization</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Practice saving/loading data</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn error handling for storage</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Plan your data structure</li>
+                                </ul>
+                                <div class="time-estimate">Time: 45-60 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">23</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Save & Load System</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement save function for all nodes</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create load function from localStorage</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add automatic save on changes</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Handle data migration/updates</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test save/load functionality</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">24</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Node Editing Features</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add double-click to edit node text</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create inline text editing system</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Handle text input and validation</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add node deletion functionality</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test editing and deletion features</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">25</div>
+                                    <div class="day-type practice">Practice</div>
+                                </div>
+                                <div class="day-title">Phase 1 Completion</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Complete Phase 1 feature testing</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Code refactoring and optimization</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Write comprehensive documentation</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create Phase 1 demo/showcase</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Plan Phase 2 architecture</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 2: Core Interactions (Days 26-50) -->
+        <div class="phase-content" id="phase2">
+            <div class="phase-header">
+                <h2 class="phase-title">Phase 2: Core Interactions (Days 26-50)</h2>
+                <p class="phase-description">Build the core mind mapping features: connecting nodes, canvas navigation, and advanced interactions. You'll create the essential functionality that makes this a true mind mapping tool.</p>
+            </div>
+
+            <!-- Week 5 -->
+            <div class="week">
+                <div class="week-header" onclick="toggleWeek(this)">
+                    <div class="week-title">Week 5: Node Connections</div>
+                    <div class="week-milestone">🎯 Connect nodes with lines</div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="week-content">
+                    <div class="week-details">
+                        <div class="milestone-box">
+                            <h4>Week 5 Milestone</h4>
+                            <p>Working connection system where you can draw lines between nodes. Connections are persistent and move with the nodes when dragged.</p>
+                        </div>
+                        <div class="days-grid">
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">26</div>
+                                    <div class="day-type learn">Learn</div>
+                                </div>
+                                <div class="day-title">Canvas Line Drawing</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn canvas line drawing methods</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Study path, moveTo, lineTo functions</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Practice drawing different line styles</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn about line caps and joins</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Experiment with curved vs straight lines</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-75 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">27</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Connection Class</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create Connection class structure</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add properties: startNode, endNode, style</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement draw() method for connections</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create connection manager system</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test basic connection rendering</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">28</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Connection Creation UI</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add connection mode toggle</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement click-to-connect interaction</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Visual feedback for connection mode</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Handle connection validation</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test connection creation flow</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">29</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Dynamic Connection Updates</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Update connections when nodes move</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement connection point calculation</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add connection anchor points</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Optimize connection redrawing</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test connection-node synchronization</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">30</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Connection Management</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add connection deletion functionality</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement connection selection</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Handle node deletion (remove connections)</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add connection styling options</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test complete connection lifecycle</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">31</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Connection Persistence</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Extend save system for connections</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Handle connection serialization</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Update load system for connections</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test save/load with connections</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Debug any persistence issues</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-75 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">32</div>
+                                    <div class="day-type practice">Practice</div>
+                                </div>
+                                <div class="day-title">Week 5 Polish & Testing</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Thoroughly test connection system</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Fix connection rendering issues</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Optimize performance with many connections</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Polish connection visual styling</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Document connection system</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 6 -->
+            <div class="week">
+                <div class="week-header" onclick="toggleWeek(this)">
+                    <div class="week-title">Week 6: Canvas Navigation</div>
+                    <div class="week-milestone">🎯 Pan and zoom functionality</div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="week-content">
+                    <div class="week-details">
+                        <div class="milestone-box">
+                            <h4>Week 6 Milestone</h4>
+                            <p>Smooth panning and zooming of the canvas. Users can navigate large mind maps easily with mouse wheel zoom and drag-to-pan functionality.</p>
+                        </div>
+                        <div class="days-grid">
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">33</div>
+                                    <div class="day-type learn">Learn</div>
+                                </div>
+                                <div class="day-title">Canvas Transformations</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn canvas transformation matrix</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Understand translate(), scale(), rotate()</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Study coordinate system transformations</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Practice basic transformations</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn save() and restore() context</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">34</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Viewport System</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create viewport/camera class</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement pan functionality</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add coordinate transformation utils</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Update mouse coordinate calculations</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test basic panning</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">35</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Zoom Implementation</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add mouse wheel event handling</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement zoom functionality</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Handle zoom center point calculation</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add zoom limits (min/max)</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test zoom interaction</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">36</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Smooth Navigation</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add smooth zoom animations</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement momentum-based panning</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add pan boundaries/limits</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Optimize rendering performance</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test smooth navigation feel</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">37</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Navigation Integration</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Update all interactions for viewport</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Fix node selection with transformations</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Update drag and drop for viewport</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Adjust connection rendering</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test all features with navigation</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">38</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Navigation UI Controls</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add zoom in/out buttons</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create fit-to-view functionality</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add minimap/overview panel</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement reset view button</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Polish navigation controls</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">39</div>
+                                    <div class="day-type practice">Practice</div>
+                                </div>
+                                <div class="day-title">Week 6 Testing & Optimization</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test navigation with large mind maps</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Optimize performance for smooth panning</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Fix any coordinate calculation bugs</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Polish navigation user experience</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Document navigation system</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 7 -->
+            <div class="week">
+                <div class="week-header" onclick="toggleWeek(this)">
+                    <div class="week-title">Week 7: Advanced Interactions</div>
+                    <div class="week-milestone">🎯 Multi-select and advanced editing</div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="week-content">
+                    <div class="week-details">
+                        <div class="milestone-box">
+                            <h4>Week 7 Milestone</h4>
+                            <p>Advanced selection system with multi-select, selection box, and bulk operations. Enhanced editing capabilities with keyboard shortcuts.</p>
+                        </div>
+                        <div class="days-grid">
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">40</div>
+                                    <div class="day-type learn">Learn</div>
+                                </div>
+                                <div class="day-title">Advanced Event Handling</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn keyboard event handling</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Study modifier keys (Ctrl, Shift, Alt)</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Understand event preventDefault</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn focus and blur events</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Practice complex event combinations</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-75 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">41</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Multi-Selection System</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement Ctrl+click multi-select</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create selection state management</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add visual feedback for selections</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Handle selection/deselection logic</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test multi-node selection</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">42</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Selection Box (Marquee)</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement drag-to-select box</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add selection rectangle rendering</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Calculate nodes within selection area</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Handle viewport transformations</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test selection box functionality</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">43</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Bulk Operations</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement multi-node dragging</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add bulk delete functionality</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create group styling options</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Handle bulk connection operations</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test bulk operation performance</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">44</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Keyboard Shortcuts</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add Delete key for node removal</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement Ctrl+A select all</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add Escape key for deselect</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create keyboard shortcut system</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test all keyboard interactions</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-75 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">45</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Context Menu System</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement right-click context menu</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add context-appropriate options</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Handle menu positioning</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create menu styling and animations</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test context menu functionality</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">46</div>
+                                    <div class="day-type practice">Practice</div>
+                                </div>
+                                <div class="day-title">Week 7 Integration & Polish</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test all advanced interactions together</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Fix any interaction conflicts</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Optimize selection performance</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Polish user experience details</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Document advanced features</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 8 -->
+            <div class="week">
+                <div class="week-header" onclick="toggleWeek(this)">
+                    <div class="week-title">Week 8: Data Management</div>
+                    <div class="week-milestone">🎯 Robust data system with import/export</div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="week-content">
+                    <div class="week-details">
+                        <div class="milestone-box">
+                            <h4>Week 8 Milestone</h4>
+                            <p>Complete data management system with improved persistence, import/export capabilities, and multiple mind map support. Foundation for Phase 3.</p>
+                        </div>
+                        <div class="days-grid">
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">47</div>
+                                    <div class="day-type learn">Learn</div>
+                                </div>
+                                <div class="day-title">File APIs & Data Formats</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn File API and FileReader</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Understand Blob and data URLs</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Study JSON data structures</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn about data validation</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Practice file operations</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-75 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">48</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Enhanced Save System</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Redesign data structure for scalability</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add data versioning support</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement auto-save functionality</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add save state indicators</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test enhanced persistence</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">49</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Export Functionality</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement JSON export</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add file download functionality</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create export UI/buttons</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add export format options</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test export functionality</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">50</div>
+                                    <div class="day-type practice">Practice</div>
+                                </div>
+                                <div class="day-title">Phase 2 Completion</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Complete all Phase 2 features</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Comprehensive testing of core interactions</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Performance optimization</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Code documentation and cleanup</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Prepare for Phase 3 advanced features</li>
+                                </ul>
+                                <div class="time-estimate">Time: 120-150 mins</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 3: Polish & Features (Days 51-75) -->
+        <div class="phase-content" id="phase3">
+            <div class="phase-header">
+                <h2 class="phase-title">Phase 3: Polish & Features (Days 51-75)</h2>
+                <p class="phase-description">Add professional polish with smooth animations, theming, undo/redo functionality, and enhanced visual design. Transform your prototype into a polished application.</p>
+            </div>
+
+            <!-- Week 9 -->
+            <div class="week">
+                <div class="week-header" onclick="toggleWeek(this)">
+                    <div class="week-title">Week 9: Animations & Transitions</div>
+                    <div class="week-milestone">🎯 Smooth animations throughout app</div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="week-content">
+                    <div class="week-details">
+                        <div class="milestone-box">
+                            <h4>Week 9 Milestone</h4>
+                            <p>Smooth, professional animations for all interactions. Node creation, selection, and transitions feel polished and responsive.</p>
+                        </div>
+                        <div class="days-grid">
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">51</div>
+                                    <div class="day-type learn">Learn</div>
+                                </div>
+                                <div class="day-title">Animation Principles</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn animation timing functions</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Study easing and interpolation</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Understand requestAnimationFrame</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn animation performance best practices</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Practice basic canvas animations</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-75 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">52</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Animation Framework</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create animation system/class</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement tweening functions</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add animation queue management</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create reusable animation helpers</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test basic animation framework</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">53</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Node Animations</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add node creation animations</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement selection animations</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create hover effects</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add node deletion animations</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test node animation smoothness</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">54</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Connection Animations</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Animate connection creation</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add connection drawing animations</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement connection pulse effects</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create connection deletion animations</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test connection animation performance</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">55</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">UI Animations</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add toolbar/menu animations</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement context menu transitions</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create loading animations</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add notification/feedback animations</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Polish overall UI animation flow</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">56</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Performance Optimization</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Optimize animation performance</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement animation culling</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add performance monitoring</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Fine-tune animation timing</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test on different devices/browsers</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">57</div>
+                                    <div class="day-type practice">Practice</div>
+                                </div>
+                                <div class="day-title">Animation Polish & Testing</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test all animations together</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Fine-tune animation parameters</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Fix any animation conflicts</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Optimize for smooth 60fps</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Document animation system</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 10 -->
+            <div class="week">
+                <div class="week-header" onclick="toggleWeek(this)">
+                    <div class="week-title">Week 10: Theming & Visual Design</div>
+                    <div class="week-milestone">🎯 Professional visual design with theming</div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="week-content">
+                    <div class="week-details">
+                        <div class="milestone-box">
+                            <h4>Week 10 Milestone</h4>
+                            <p>Beautiful, professional visual design with multiple themes, consistent styling, and polished UI components. Your app looks market-ready.</p>
+                        </div>
+                        <div class="days-grid">
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">58</div>
+                                    <div class="day-type learn">Learn</div>
+                                </div>
+                                <div class="day-title">Design Systems & Color Theory</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Study modern design systems</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn color theory and palettes</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Understand typography principles</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Research current design trends</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Plan your app's visual identity</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-75 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">59</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Theme System Architecture</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create theme management system</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Design theme data structure</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement theme switching logic</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create CSS custom properties system</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test basic theme switching</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">60</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Light & Dark Themes</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Design light theme color palette</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create dark theme variant</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Update all UI components for themes</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement theme persistence</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test theme consistency</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">61</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Node Styling System</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create node style templates</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add multiple node shapes/styles</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement style picker UI</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add custom color options</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test node styling variety</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">62</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Connection Styling</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add connection style options</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement different line types</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add connection colors and thickness</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create arrow/connector styles</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test connection visual variety</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">63</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">UI Polish & Consistency</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Polish all UI components</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Ensure consistent spacing/sizing</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add proper visual hierarchy</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement consistent iconography</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test visual consistency across app</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">64</div>
+                                    <div class="day-type practice">Practice</div>
+                                </div>
+                                <div class="day-title">Design System Testing</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test all themes and styles</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Verify accessibility compliance</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Get feedback on visual design</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Make design refinements</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Document design system</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 11 -->
+            <div class="week">
+                <div class="week-header" onclick="toggleWeek(this)">
+                    <div class="week-title">Week 11: Undo/Redo & Advanced Features</div>
+                    <div class="week-milestone">🎯 Complete undo/redo system</div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="week-content">
+                    <div class="week-details">
+                        <div class="milestone-box">
+                            <h4>Week 11 Milestone</h4>
+                            <p>Robust undo/redo system supporting all operations. Advanced features like search, templates, and enhanced export options.</p>
+                        </div>
+                        <div class="days-grid">
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">65</div>
+                                    <div class="day-type learn">Learn</div>
+                                </div>
+                                <div class="day-title">Command Pattern & State Management</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn Command design pattern</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Understand state snapshots</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Study undo/redo architectures</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn about memento pattern</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Plan undo system architecture</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">66</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Command System Implementation</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create Command base class</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement command history stack</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add execute/undo methods</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create command manager</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test basic command system</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">67</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Operation Commands</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create AddNodeCommand</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement MoveNodeCommand</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add DeleteNodeCommand</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create ConnectionCommands</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test individual commands</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">68</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Undo/Redo Integration</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Integrate commands with all operations</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add Ctrl+Z and Ctrl+Y shortcuts</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement undo/redo UI buttons</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Handle complex multi-step operations</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test complete undo/redo system</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">69</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Search & Filter System</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add search functionality</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement node text searching</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create search UI/toolbar</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add search result highlighting</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test search performance</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">70</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Templates & Presets</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create mind map templates</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add template loading system</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement style presets</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create template gallery UI</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test template functionality</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">71</div>
+                                    <div class="day-type practice">Practice</div>
+                                </div>
+                                <div class="day-title">Advanced Features Integration</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test all advanced features together</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Optimize undo/redo performance</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Fix any feature conflicts</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Polish advanced feature UX</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Document advanced systems</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 12 -->
+            <div class="week">
+                <div class="week-header" onclick="toggleWeek(this)">
+                    <div class="week-title">Week 12: Export & Responsive Design</div>
+                    <div class="week-milestone">🎯 Multiple export formats & mobile-friendly</div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="week-content">
+                    <div class="week-details">
+                        <div class="milestone-box">
+                            <h4>Week 12 Milestone</h4>
+                            <p>Advanced export capabilities (PNG, SVG, PDF) and responsive design that works on tablets and mobile devices.</p>
+                        </div>
+                        <div class="days-grid">
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">72</div>
+                                    <div class="day-type learn">Learn</div>
+                                </div>
+                                <div class="day-title">Export Technologies</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn Canvas toDataURL method</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Study SVG generation</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Understand PDF creation libraries</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn about image formats</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Plan export system architecture</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-75 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">73</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Image Export System</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement PNG export</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add high-resolution export options</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create export preview system</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Handle export cropping/bounds</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test image export quality</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">74</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Responsive Design Implementation</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add responsive CSS breakpoints</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Optimize UI for tablets</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add touch gesture support</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create mobile-friendly toolbar</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test on various screen sizes</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">75</div>
+                                    <div class="day-type practice">Practice</div>
+                                </div>
+                                <div class="day-title">Phase 3 Completion</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Complete all Phase 3 features</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Comprehensive testing across devices</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Performance optimization</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Final polish and bug fixes</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Prepare for final refinement phase</li>
+                                </ul>
+                                <div class="time-estimate">Time: 120-150 mins</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 4: Refinement (Days 76-100) -->
+        <div class="phase-content" id="phase4">
+            <div class="phase-header">
+                <h2 class="phase-title">Phase 4: Refinement (Days 76-100)</h2>
+                <p class="phase-description">Final polish, performance optimization, comprehensive testing, and deployment. Transform your prototype into a production-ready application.</p>
+            </div>
+
+            <!-- Week 13 -->
+            <div class="week">
+                <div class="week-header" onclick="toggleWeek(this)">
+                    <div class="week-title">Week 13: Performance & Optimization</div>
+                    <div class="week-milestone">🎯 Optimized performance for large mind maps</div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="week-content">
+                    <div class="week-details">
+                        <div class="milestone-box">
+                            <h4>Week 13 Milestone</h4>
+                            <p>Highly optimized application that performs smoothly with hundreds of nodes and connections. Professional-grade performance.</p>
+                        </div>
+                        <div class="days-grid">
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">76</div>
+                                    <div class="day-type learn">Learn</div>
+                                </div>
+                                <div class="day-title">Performance Analysis Tools</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn browser dev tools profiling</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Understand performance metrics</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Study memory management</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn about rendering optimization</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Analyze current app performance</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-75 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">77</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Rendering Optimization</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement viewport culling</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add level-of-detail rendering</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Optimize canvas drawing operations</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement dirty region updates</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test rendering performance improvements</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">78</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Memory & Data Optimization</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Optimize data structures</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement object pooling</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add garbage collection management</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Optimize event listener management</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test memory usage improvements</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">79</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Interaction Optimization</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Optimize hit detection algorithms</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement spatial indexing</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add interaction debouncing</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Optimize drag performance</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test interaction responsiveness</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">80</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Large Dataset Handling</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement virtual scrolling concepts</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add progressive loading</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Optimize search for large datasets</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add performance monitoring</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test with stress datasets</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">81</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Performance Monitoring</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add FPS monitoring</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Implement performance metrics dashboard</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create performance warnings</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add optimization suggestions</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test performance monitoring system</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-75 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">82</div>
+                                    <div class="day-type practice">Practice</div>
+                                </div>
+                                <div class="day-title">Performance Testing & Tuning</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Comprehensive performance testing</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Fine-tune optimization parameters</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test on different devices</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Benchmark against original version</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Document performance improvements</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 14 -->
+            <div class="week">
+                <div class="week-header" onclick="toggleWeek(this)">
+                    <div class="week-title">Week 14: Testing & Bug Fixes</div>
+                    <div class="week-milestone">🎯 Thoroughly tested, bug-free application</div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="week-content">
+                    <div class="week-details">
+                        <div class="milestone-box">
+                            <h4>Week 14 Milestone</h4>
+                            <p>Comprehensive testing completed with all major bugs fixed. Application is stable and reliable across different browsers and devices.</p>
+                        </div>
+                        <div class="days-grid">
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">83</div>
+                                    <div class="day-type learn">Learn</div>
+                                </div>
+                                <div class="day-title">Testing Strategies</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn manual testing methodologies</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Understand edge case testing</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Study browser compatibility testing</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn about user acceptance testing</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Plan comprehensive testing strategy</li>
+                                </ul>
+                                <div class="time-estimate">Time: 45-60 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">84</div>
+                                    <div class="day-type practice">Practice</div>
+                                </div>
+                                <div class="day-title">Feature Testing</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test all core features systematically</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Verify node creation and editing</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test connection system thoroughly</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Validate navigation and zoom</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Document found issues</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">85</div>
+                                    <div class="day-type practice">Practice</div>
+                                </div>
+                                <div class="day-title">Edge Case Testing</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test with empty mind maps</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test with extremely large datasets</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test error conditions</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Verify boundary conditions</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test recovery scenarios</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">86</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Bug Fixes - Core Features</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Fix node creation/editing bugs</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Resolve connection issues</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Fix navigation problems</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Resolve selection issues</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test fixes thoroughly</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">87</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Bug Fixes - Advanced Features</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Fix undo/redo issues</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Resolve theme switching problems</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Fix export functionality bugs</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Resolve performance issues</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test advanced feature fixes</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">88</div>
+                                    <div class="day-type practice">Practice</div>
+                                </div>
+                                <div class="day-title">Cross-Browser Testing</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test in Chrome, Firefox, Safari</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test on different operating systems</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Verify mobile browser compatibility</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Fix any browser-specific issues</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Document browser support</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">89</div>
+                                    <div class="day-type practice">Practice</div>
+                                </div>
+                                <div class="day-title">Final Bug Fixes & Regression Testing</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Fix any remaining critical bugs</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Perform regression testing</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Verify all fixes work correctly</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test complete user workflows</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Final stability verification</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 15 -->
+            <div class="week">
+                <div class="week-header" onclick="toggleWeek(this)">
+                    <div class="week-title">Week 15: Documentation & Deployment</div>
+                    <div class="week-milestone">🎯 Complete documentation and live deployment</div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="week-content">
+                    <div class="week-details">
+                        <div class="milestone-box">
+                            <h4>Week 15 Milestone</h4>
+                            <p>Comprehensive documentation, user guide, and live deployment. Your mind mapping app is ready for users and showcases your development skills.</p>
+                        </div>
+                        <div class="days-grid">
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">90</div>
+                                    <div class="day-type learn">Learn</div>
+                                </div>
+                                <div class="day-title">Documentation Best Practices</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn technical documentation writing</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Study user guide creation</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Understand code documentation</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Learn about deployment platforms</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Plan documentation structure</li>
+                                </ul>
+                                <div class="time-estimate">Time: 45-60 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">91</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Code Documentation</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add comprehensive code comments</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Document all classes and methods</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create API documentation</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add inline code examples</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Generate documentation website</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">92</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">User Guide & Tutorial</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create comprehensive user guide</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Write step-by-step tutorials</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add screenshots and examples</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create getting started guide</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test user guide completeness</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">93</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">README & Project Documentation</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Write comprehensive README.md</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Document installation/setup process</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add feature list and screenshots</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create development setup guide</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add project roadmap and changelog</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">94</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Deployment Preparation</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Optimize build for production</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Minimize and compress assets</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Configure deployment settings</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test production build locally</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Prepare deployment checklist</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">95</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Live Deployment</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Deploy to Netlify or similar platform</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Configure custom domain (optional)</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Set up analytics and monitoring</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test live deployment thoroughly</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Configure SEO and meta tags</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">96</div>
+                                    <div class="day-type build">Build</div>
+                                </div>
+                                <div class="day-title">Portfolio & Showcase</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create project showcase page</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Add to your portfolio website</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Write project case study</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Create demo videos/GIFs</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Share on social media/GitHub</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">97</div>
+                                    <div class="day-type practice">Practice</div>
+                                </div>
+                                <div class="day-title">Final Testing & Launch</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Complete end-to-end testing</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Verify all documentation links</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Test from user perspective</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Launch publicly and share</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Gather initial user feedback</li>
+                                </ul>
+                                <div class="time-estimate">Time: 90-120 mins</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 16 -->
+            <div class="week">
+                <div class="week-header" onclick="toggleWeek(this)">
+                    <div class="week-title">Week 16: Reflection & Next Steps</div>
+                    <div class="week-milestone">🎯 100-Day Challenge Complete!</div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="week-content">
+                    <div class="week-details">
+                        <div class="milestone-box">
+                            <h4>Week 16 Milestone</h4>
+                            <p>🎉 Congratulations! You've completed the 100-day challenge with a fully functional, deployed mind mapping application. Time to celebrate and plan your next steps!</p>
+                        </div>
+                        <div class="days-grid">
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">98</div>
+                                    <div class="day-type practice">Practice</div>
+                                </div>
+                                <div class="day-title">Project Reflection</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Review your complete journey</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Document lessons learned</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Identify key skills acquired</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Analyze what worked well</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Note areas for improvement</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">99</div>
+                                    <div class="day-type practice">Practice</div>
+                                </div>
+                                <div class="day-title">Skill Assessment & Portfolio Update</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Update your resume/CV</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Assess your new skill level</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Update LinkedIn profile</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Plan follow-up projects</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Set new learning goals</li>
+                                </ul>
+                                <div class="time-estimate">Time: 75-90 mins</div>
+                            </div>
+                            <div class="day">
+                                <div class="day-header">
+                                    <div class="day-number">100</div>
+                                    <div class="day-type practice">Practice</div>
+                                </div>
+                                <div class="day-title">🎉 Celebration & Year Plan</div>
+                                <ul class="day-tasks">
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Celebrate your achievement!</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Share your success story</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Plan your 1-year roadmap</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Identify next learning priorities</li>
+                                    <li onclick="toggleTask(this)"><span class="task-checkbox"></span>Start planning Phase 2 features</li>
+                                </ul>
+                                <div class="time-estimate">Time: 60-90 mins</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPhase = 1;
+
+        function showPhase(phaseNum) {
+            // Hide all phase contents
+            document.querySelectorAll('.phase-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Show selected phase
+            document.getElementById(`phase${phaseNum}`).classList.add('active');
+            
+            // Update button states
+            document.querySelectorAll('.phase-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            event.target.classList.add('active');
+            currentPhase = phaseNum;
+        }
+
+        function toggleWeek(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.toggle-icon');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.textContent = '▼';
+            } else {
+                content.classList.add('expanded');
+                icon.textContent = '▲';
+            }
+        }
+
+        // Initialize - expand first week of first phase
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstWeek = document.querySelector('#phase1 .week-content');
+            if (firstWeek) {
+                firstWeek.classList.add('expanded');
+                const firstIcon = document.querySelector('#phase1 .toggle-icon');
+                if (firstIcon) {
+                    firstIcon.textContent = '▲';
+                }
+            }
+            
+            // Load saved progress
+            loadProgress();
+        });
+
+        function toggleTask(taskElement) {
+            const checkbox = taskElement.querySelector('.task-checkbox');
+            const isChecked = checkbox.classList.contains('checked');
+            
+            if (isChecked) {
+                checkbox.classList.remove('checked');
+                taskElement.classList.remove('completed');
+            } else {
+                checkbox.classList.add('checked');
+                taskElement.classList.add('completed');
+            }
+            
+            // Update progress for this day
+            updateDayProgress(taskElement.closest('.day'));
+            
+            // Save progress to localStorage
+            saveProgress();
+        }
+
+        function updateDayProgress(dayElement) {
+            const tasks = dayElement.querySelectorAll('.day-tasks li');
+            const completedTasks = dayElement.querySelectorAll('.day-tasks li.completed');
+            const percentage = tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0;
+            
+            // Create or update progress indicator
+            let progressContainer = dayElement.querySelector('.progress-container');
+            if (!progressContainer) {
+                progressContainer = document.createElement('div');
+                progressContainer.className = 'progress-container';
+                progressContainer.innerHTML = `
+                    <div class="progress-indicator">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-text">0% Complete</div>
+                `;
+                dayElement.querySelector('.time-estimate').insertAdjacentElement('afterend', progressContainer);
+            }
+            
+            const progressBar = progressContainer.querySelector('.progress-bar');
+            const progressText = progressContainer.querySelector('.progress-text');
+            
+            progressBar.style.width = `${percentage}%`;
+            progressText.textContent = `${percentage}% Complete`;
+        }
+
+        function saveProgress() {
+            const progress = {};
+            document.querySelectorAll('.day-tasks li').forEach((task, index) => {
+                const dayElement = task.closest('.day');
+                const dayNumber = dayElement.querySelector('.day-number').textContent;
+                const phaseElement = task.closest('.phase-content');
+                const phaseId = phaseElement.id;
+                
+                if (!progress[phaseId]) {
+                    progress[phaseId] = {};
+                }
+                if (!progress[phaseId][dayNumber]) {
+                    progress[phaseId][dayNumber] = [];
+                }
+                
+                progress[phaseId][dayNumber].push({
+                    text: task.textContent.trim(),
+                    completed: task.classList.contains('completed')
+                });
+            });
+            
+            localStorage.setItem('mindMapAppProgress', JSON.stringify(progress));
+        }
+
+        function loadProgress() {
+            const savedProgress = localStorage.getItem('mindMapAppProgress');
+            if (!savedProgress) return;
+            
+            try {
+                const progress = JSON.parse(savedProgress);
+                
+                document.querySelectorAll('.day-tasks li').forEach(task => {
+                    const dayElement = task.closest('.day');
+                    const dayNumber = dayElement.querySelector('.day-number').textContent;
+                    const phaseElement = task.closest('.phase-content');
+                    const phaseId = phaseElement.id;
+                    
+                    if (progress[phaseId] && progress[phaseId][dayNumber]) {
+                        const taskText = task.textContent.trim();
+                        const savedTask = progress[phaseId][dayNumber].find(t => t.text === taskText);
+                        
+                        if (savedTask && savedTask.completed) {
+                            const checkbox = task.querySelector('.task-checkbox');
+                            checkbox.classList.add('checked');
+                            task.classList.add('completed');
+                        }
+                    }
+                });
+                
+                // Update all day progress indicators
+                document.querySelectorAll('.day').forEach(dayElement => {
+                    updateDayProgress(dayElement);
+                });
+                
+            } catch (error) {
+                console.error('Error loading progress:', error);
+            }
+        }
+    </script>
+</body>
+</html>
